@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: investtrack-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn investtrack.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: CORS_ALLOW_ALL_ORIGINS
+        value: "True"

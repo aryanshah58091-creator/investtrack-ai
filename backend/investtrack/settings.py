@@ -13,7 +13,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = env('SECRET_KEY', default='django-insecure-change-me-in-production')
 DEBUG = env('DEBUG', default=True)
-ALLOWED_HOSTS = list(set(env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1']) + ['localhost', '127.0.0.1', 'testserver']))
+ALLOWED_HOSTS = list(set(env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '.onrender.com', '.railway.app', '.vercel.app']) + ['localhost', '127.0.0.1', 'testserver', '.onrender.com', '.railway.app']))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -73,11 +73,25 @@ TEMPLATES = [
 # ASGI for Django Channels
 ASGI_APPLICATION = 'investtrack.asgi.application'
 
-# Database - Defaults to SQLite for local development; switches to MySQL if USE_MYSQL=True or DB_ENGINE='mysql'
+# Database - Auto-detects DATABASE_URL in cloud environments (Render, Railway, Supabase)
+DATABASE_URL = env('DATABASE_URL', default=None)
 USE_MYSQL = env.bool('USE_MYSQL', default=False)
 DB_ENGINE = env('DB_ENGINE', default='mysql' if USE_MYSQL else 'sqlite')
 
-if DB_ENGINE == 'mysql' or USE_MYSQL:
+if DATABASE_URL:
+    try:
+        import dj_database_url
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+        }
+    except Exception:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+elif DB_ENGINE == 'mysql' or USE_MYSQL:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -179,6 +193,13 @@ CORS_ALLOWED_ORIGINS = env.list(
     'CORS_ALLOWED_ORIGINS',
     default=['http://localhost:5173', 'http://localhost:3000']
 )
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https:\/\/.*\.vercel\.app$",
+    r"^https:\/\/.*\.netlify\.app$",
+    r"^https:\/\/.*\.onrender\.com$",
+    r"^https:\/\/.*\.railway\.app$",
+]
+CORS_ALLOW_ALL_ORIGINS = env.bool('CORS_ALLOW_ALL_ORIGINS', default=False)
 CORS_ALLOW_CREDENTIALS = True
 
 # Static & Media
