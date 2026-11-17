@@ -13,7 +13,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = env('SECRET_KEY', default='django-insecure-change-me-in-production')
 DEBUG = env('DEBUG', default=True)
-ALLOWED_HOSTS = list(set(env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '.onrender.com', '.railway.app', '.vercel.app']) + ['localhost', '127.0.0.1', 'testserver', '.onrender.com', '.railway.app']))
+ALLOWED_HOSTS = list(set(env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '.onrender.com', '.railway.app', '.vercel.app', '.pythonanywhere.com']) + ['localhost', '127.0.0.1', 'testserver', '.onrender.com', '.railway.app', '.pythonanywhere.com', '*']))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
